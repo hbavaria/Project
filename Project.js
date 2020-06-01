@@ -11,8 +11,8 @@ function main(){
     regedit.list(regPath, function(err,result){
     //Reading justh the value(path) of the INstallation of DeltaV
     defaultValue = result[regPath].values['DATA_DIRECTORY'].value
-    finalResult = processFolder(defaultValue)
-    console.log(finalResult)
+    processFolder(defaultValue)
+    //console.log(finalResult)
     //sendData(finalResult)
     })
 
@@ -26,11 +26,13 @@ async function processFolder(defaultValue){
     }
     //await readDirectory(folder)
     //sendData(finalResult)
-    await readDirectory(folder) 
+    finalResults = await readDirectory(folder)
+    console.log(finalResults) 
+    sendData(finalResults)
 }
 
 async function readDirectory(folder){
-    //let results = []
+    let results = []
     //let i = 0
     // Reading all the files in the directory and finding '.csv' extension and then read it and convert it to json string  
     let files=fs.readdirSync(folder)
@@ -39,47 +41,37 @@ async function readDirectory(folder){
         let stat = fs.lstatSync(fileName)
         if (stat.isDirectory()){
             //combine two arrays (result and one declared in  this function)
-            //results = results.concat((await readDirectory(fileName))) //recurse
-            await readDirectory(fileName)
+            results = results.concat((await readDirectory(fileName))) //recurse
+            //await readDirectory(fileName)
         }
         else if (fileName.indexOf('.csv')>=0) {
             //i = i + 1
         
             // Calling the funtion to read that file.
-             //results.push(await readPerformancefile(fileName))
-             return new Promise((resolve, reject) => {
-                fs.readFile(fileName, 'utf8', function (err, data) {
-                  if (err) {
-                    reject(err);
-                  }
-                  let jsonObj = csvjson.toObject(data);
-                  resolve(jsonObj);
-                  //console.log(jsonObj)
-                  return jsonObj
-                  //console.log(jsonObj)
-                });
+             results.push(await readPerformancefile(fileName))
              //await readPerformancefile(fileName)
-        })
+        }
         //i = i+1
     }
+    //console.log(results)
+    //sendData(results)
+    return results
 }
-    //console.log(i)
-    //console.log(results.Node)
-    //return results
-    }
 
-//async function readPerformancefile(fileName){
-    // return new Promise((resolve, reject) => {
-    //     fs.readFile(fileName, 'utf8', function (err, data) {
-    //       if (err) {
-    //         reject(err);
-    //       }
-    //       let jsonObj = csvjson.toObject(data);
-    //       resolve(jsonObj);
-    //       //console.log(jsonObj)
-    //       return jsonObj
-    //       //console.log(jsonObj)
-    //     });
+async function readPerformancefile(fileName){
+    return new Promise((resolve, reject) => {
+        fs.readFile(fileName, 'utf8', function (err, data) {
+          if (err) {
+            reject(err);
+          }
+          let jsonObj = csvjson.toObject(data);
+          resolve(jsonObj);
+          //console.log(jsonObj)
+          return jsonObj
+          //console.log(jsonObj)
+    });
+    })
+}
     //var jsonArray = [];
 //This will read the file.
 // fs.readFile(fileName,{encoding:'utf-8'},function(err,data){
@@ -133,19 +125,17 @@ async function readDirectory(folder){
         //  return jsonObj
         //let jsonObj = csvTojson.toObject(fileName)
         //console.log(jsonObj)
-         //})
 
-//}
-async function sendData(finalResult){
+async function sendData(finalResults){
       request({
         url: "http://localhost:4000/csvRoute/todos",
         method: "POST",
         json: true, 
-        body: finalResult
+        body: finalResults
     }, function (error, response, body){
         console.log(`statusCode: ${response.statusCode}`)
      });
-     //console.log(jsonObj)
+     console.log(finalResults)
     //console.log(jsonObj[0][' Run Group'])
 }
 }
