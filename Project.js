@@ -4,7 +4,7 @@ function main(){
     const fs = require('fs')
     const path = require('path')
     //const csvTojson = require('csvtojson')
-    const csvjson = require("csvJson")
+    const csvjson = require('csvJson')
 
     const regPath = 'HKLM\\SOFTWARE\\WOW6432Node\\Emerson\\CIF'
     // Listing all the objects from that registry
@@ -64,7 +64,11 @@ async function readPerformancefile(fileName){
           if (err) {
             reject(err);
           }
-          let jsonObj = csvjson.toObject(data);
+          var options = {
+            delimiter : ',', // optional
+            quote     : '"' // optional
+          }
+          let jsonObj = csvjson.toObject(data, options);
           resolve(jsonObj);
           //console.log(jsonObj)
           return jsonObj
@@ -72,59 +76,6 @@ async function readPerformancefile(fileName){
     });
     })
 }
-    //var jsonArray = [];
-//This will read the file.
-// fs.readFile(fileName,{encoding:'utf-8'},function(err,data){
-//     if(err){
-//        return  console.log(err);
-//     }
-//     //The following line will split the csv file line by line and store each of it in the vraiable dataArray.
-//     var dataArray = data.split(/\r?\n/);
-//     var fieldsArray = dataArray[0].split(",")
-    //console.log(dataArray)
-    //This line helps us to obtain the keys for various values in the file.
-    //var fieldsArray =  dataArray.split(",");
-
-    //The following loop creates an object for every line and then pushes it into the array.
-//     for(var i=1;i<dataArray.length;i++){
-//         var temp = [];
-//         //console.log(fieldsArray)
-//         //contains values which are separated by a comma in a line.
-//         var valuesArray = dataArray[i].split(",");
-//             for(var k=0;k<valuesArray.length;k++){
-//                 temp[fieldsArray[k]] = valuesArray[k]
-//             }   
-//             //pushes the object into the array.
-//             jsonArray.push(temp);
-//             //console.log(temp)
-//     }
-//     console.log(jsonArray)
-//     //console.log(temp)
-//    });
-//  fs.readFile(fileName, 'utf-8', (err, fileContent) => {
-//      if(err) {
-//          console.log(err); // Do something to handle the error or just throw it
-//          throw new Error(err);
-//      }
-//      let jsonObj = csvjson.toObject(fileContent);
-//      console.log(jsonObj[5])
-//      //return jsonObj
-//  });console.log(data)
- //return data
-
- //console.log(jsonObj)
-    //console.log(jsonObj)
-    //sendData(jsonObj)
-  //});
-//}    
-    //REading the file and converting it into json string
-        //  return await csvTojson()
-        //  .fromFile(fileName)
-        //  .then((jsonObj)=>{
-        //      //console.log(jsonObj)
-        //  return jsonObj
-        //let jsonObj = csvTojson.toObject(fileName)
-        //console.log(jsonObj)
 
 async function sendData(finalResults){
       request({
@@ -137,7 +88,7 @@ async function sendData(finalResults){
      });
      //let parseData = Json.parse(finalResults)
      //console.log(parseData)
-     console.log(finalResults[0][0][' Session'])
+     console.log(finalResults)
     //console.log(jsonObj[0][' Run Group'])
 }
 }
