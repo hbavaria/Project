@@ -135,7 +135,9 @@ async function sendData(finalResults){
     }, function (error, response, body){
         console.log(`statusCode: ${response.statusCode}`)
      });
-     console.log(finalResults)
+     //let parseData = Json.parse(finalResults)
+     //console.log(parseData)
+     console.log(finalResults[0][0][' Session'])
     //console.log(jsonObj[0][' Run Group'])
 }
 }
