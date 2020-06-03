@@ -27,7 +27,7 @@ async function processFolder(defaultValue){
     //await readDirectory(folder)
     //sendData(finalResult)
     finalResults = await readDirectory(folder)
-    console.log(finalResults) 
+    //console.log(finalResults) 
     sendData(finalResults)
 }
 
