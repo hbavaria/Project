@@ -4,6 +4,7 @@ function main(){
     const fs = require('fs')
     const path = require('path')
     const csvjson = require('csvJson')
+    let moment  = require('moment')
 
     const regPath = 'HKLM\\SOFTWARE\\WOW6432Node\\Emerson\\CIF'
     // Listing all the objects from that registry
@@ -13,7 +14,7 @@ function main(){
     processFolder(defaultValue)
     })
 
-async function processFolder(defaultValue){
+ async function processFolder(defaultValue){
     // Merging the path and some of the subfolder which were not in the path and are common on all devices
     let folder = defaultValue + '\\Performance'
     if (!fs.existsSync(folder)){
@@ -24,7 +25,7 @@ async function processFolder(defaultValue){
     sendData(finalResults)
 }
 
-async function readDirectory(folder){
+ async function readDirectory(folder){
     let results = []
     // Reading all the files in the directory and finding '.csv' extension and then read it and convert it to json string  
     let files=fs.readdirSync(folder)
@@ -41,7 +42,7 @@ async function readDirectory(folder){
     return results
 }
 
-async function readPerformancefile(fileName){
+ async function readPerformancefile(fileName){
     return new Promise((resolve, reject) => {
         fs.readFile(fileName, 'utf8', function (err, data) {
           if (err) {
@@ -58,8 +59,10 @@ async function readPerformancefile(fileName){
     })
 }
 
-async function sendData(finalResults){
-      request({
+ async function sendData(finalResults){
+    await convertTonumbers(finalResults)
+    convertTodate(finalResults)  
+    request({
         url: "http://localhost:4000/csvRoute/todos",
         method: "POST",
         json: true, 
@@ -67,7 +70,29 @@ async function sendData(finalResults){
     }, function (error, response, body){
         console.log(`statusCode: ${response.statusCode}`)
      });
-     console.log(finalResults[0][0].Session)
 }
+
+ async function convertTonumbers(finalResults){
+    for(var index = 0; index < finalResults.length; index ++){
+        for(let i = 0; i < finalResults[index].length; i ++){
+            var obj = finalResults[index][i];
+            for(var prop in obj){
+                if(obj.hasOwnProperty(prop) && obj[prop] !== null && !isNaN(obj[prop])){
+                    obj[prop] = +obj[prop];   
+                }
+            }
+        }
+    }
+    }
+ function convertTodate(finalResults){
+     for (let index = 0; index < finalResults.length; index ++){
+         for(let i = 0; i < finalResults[index].length; i ++){
+            let startDate = new Date(finalResults[index][i].Start)
+            let endDate = new Date(finalResults[index][i].End)
+            finalResults[index][i].Start = startDate
+            finalResults[index][i].End = endDate
+         }
+     }
+ }
 }
 main();
