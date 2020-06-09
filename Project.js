@@ -61,7 +61,7 @@ function main(){
 
  async function sendData(finalResults){
     await convertTonumbers(finalResults)
-    convertTodate(finalResults)  
+    await convertTodate(finalResults)  
     request({
         url: "http://localhost:4000/csvRoute/todos",
         method: "POST",
@@ -84,7 +84,7 @@ function main(){
         }
     }
     }
- function convertTodate(finalResults){
+ async function convertTodate(finalResults){
      for (let index = 0; index < finalResults.length; index ++){
          for(let i = 0; i < finalResults[index].length; i ++){
             let startDate = new Date(finalResults[index][i].Start)
