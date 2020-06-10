@@ -4,7 +4,7 @@ function main(){
     const fs = require('fs')
     const path = require('path')
     const csvjson = require('csvJson')
-    let moment  = require('moment')
+
 
     const regPath = 'HKLM\\SOFTWARE\\WOW6432Node\\Emerson\\CIF'
     // Listing all the objects from that registry
@@ -93,6 +93,6 @@ function main(){
             finalResults[index][i].End = endDate
          }
      }
- }
+}
 }
 main();
