@@ -87,10 +87,10 @@ function main(){
  async function convertTodate(finalResults){
      for (let index = 0; index < finalResults.length; index ++){
          for(let i = 0; i < finalResults[index].length; i ++){
-            let startDate = new Date(finalResults[index][i].Start)
-            let endDate = new Date(finalResults[index][i].End)
-            finalResults[index][i].Start = startDate
-            finalResults[index][i].End = endDate
+            let startDate = finalResults[index][i].Start + 'Z'
+            let endDate = finalResults[index][i].End + 'Z'
+            finalResults[index][i].Start = new Date(startDate)
+            finalResults[index][i].End = new Date(endDate)
          }
      }
 }
