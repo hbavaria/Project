@@ -60,8 +60,8 @@ function main(){
 }
 
  async function sendData(finalResults){
-    await convertTonumbers(finalResults)
-    await convertTodate(finalResults)  
+    convertTonumbers(finalResults)
+    convertTodate(finalResults)  
     request({
         url: "http://localhost:4000/csvRoute/todos",
         method: "POST",
@@ -72,7 +72,7 @@ function main(){
      });
 }
 
- async function convertTonumbers(finalResults){
+ function convertTonumbers(finalResults){
     for(var index = 0; index < finalResults.length; index ++){
         for(let i = 0; i < finalResults[index].length; i ++){
             var obj = finalResults[index][i];
@@ -84,7 +84,7 @@ function main(){
         }
     }
     }
- async function convertTodate(finalResults){
+ function convertTodate(finalResults){
      for (let index = 0; index < finalResults.length; index ++){
          for(let i = 0; i < finalResults[index].length; i ++){
             let startDate = finalResults[index][i].Start + 'Z'
