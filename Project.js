@@ -63,7 +63,7 @@ function main(){
     convertTonumbers(finalResults)
     convertTodate(finalResults)  
     request({
-        url: "http://localhost:4000/StorePerformanceResults/todos",
+        url: "http://localhost:4000/StorePerformanceData/todos",
         method: "POST",
         json: true, 
         body: finalResults
