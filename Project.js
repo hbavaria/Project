@@ -4,7 +4,8 @@ function main(){
     const fs = require('fs')
     const path = require('path')
     const csvjson = require('csvJson')
-
+    const dateFormat = require('dateformat')
+    const fetch = require('node-fetch')
 
     const regPath = 'HKLM\\SOFTWARE\\WOW6432Node\\Emerson\\CIF'
     // Listing all the objects from that registry
@@ -15,14 +16,32 @@ function main(){
     })
 
  async function processFolder(defaultValue){
+     let data = []
     // Merging the path and some of the subfolder which were not in the path and are common on all devices
     let folder = defaultValue + '\\Performance'
     if (!fs.existsSync(folder)){
         console.log("no dir ",folder);
         return;
     }
+    let date = await getDate()
+    //console.log(date)
     finalResults = await readDirectory(folder)
-    sendData(finalResults)
+    for(let index = 0; index < finalResults.length; index ++){
+        for(let i = 0; i < finalResults[index].length; i++){
+            let end = new Date(finalResults[index][i].End)
+            let endDate = dateFormat(end, "yyyy-mm-dd'T'HH:MM:ss.ms")
+            //console.log(endDate)
+            if(date < endDate){
+                data.push(finalResults[index][i])  
+            }else if(date > endDate){
+                data = []
+            } else{
+                data.push(finalResults[index][i])
+            }
+        }
+    }
+    console.log(data.length)
+    sendData(data)
 }
 
  async function readDirectory(folder){
@@ -39,6 +58,7 @@ function main(){
              results.push(await readPerformancefile(fileName))
         }
     }
+
     return results
 }
 
@@ -59,40 +79,49 @@ function main(){
     })
 }
 
- async function sendData(finalResults){
-    convertTonumbers(finalResults)
-    convertTodate(finalResults)  
+ async function sendData(data){
+    convertTonumbers(data)
+    convertTodate(data)  
     request({
-        url: "http://10.223.31.195:4000/StorePerformanceResults/todos",
+        url: "http://localhost:4000/StorePerformanceData/todos",
         method: "POST",
         json: true, 
-        body: finalResults
+        body: data
     }, function (error, response, body){
         console.log(`statusCode: ${response.statusCode}`)
      });
 }
 
- function convertTonumbers(finalResults){
-    for(var index = 0; index < finalResults.length; index ++){
-        for(let i = 0; i < finalResults[index].length; i ++){
-            var obj = finalResults[index][i];
+ function convertTonumbers(data){
+    for(var index = 0; index < data.length; index ++){
+        //for(let i = 0; i < finalResults[index].length; i ++){
+            var obj = data[index];
             for(var prop in obj){
                 if(obj.hasOwnProperty(prop) && obj[prop] !== null && !isNaN(obj[prop])){
                     obj[prop] = +obj[prop];   
                 }
             }
-        }
+        //}
     }
     }
- function convertTodate(finalResults){
-     for (let index = 0; index < finalResults.length; index ++){
-         for(let i = 0; i < finalResults[index].length; i ++){
-            let startDate = finalResults[index][i].Start + 'Z'
-            let endDate = finalResults[index][i].End + 'Z'
-            finalResults[index][i].Start = new Date(startDate)
-            finalResults[index][i].End = new Date(endDate)
-         }
+ function convertTodate(data){
+     for (let index = 0; index < data.length; index ++){
+         //for(let i = 0; i < finalResults[index].length; i ++){
+            let startDate = data[index].Start + 'Z'
+            let endDate = data[index].End + 'Z'
+            data[index].Start = new Date(startDate)
+            data[index].End = new Date(endDate)
+         //}
      }
 }
+async function getDate(){
+    let response = await fetch("http://localhost:4000/sendDate/date")
+    let data = await response.json()
+    let date = new Date(data)
+    let formattedDate = dateFormat(date, "yyyy-mm-dd'T'HH:MM:ss.ms")
+    //console.log(formattedDate)
+    return formattedDate
+    }
+
 }
 main();
