@@ -83,7 +83,7 @@ function main(){
     convertTonumbers(data)
     convertTodate(data)  
     request({
-        url: "http://localhost:4000/StorePerformanceData/todos",
+        url: "http://10.223.31.195:4000/StorePerformanceResults/todos",
         method: "POST",
         json: true, 
         body: data
@@ -115,7 +115,7 @@ function main(){
      }
 }
 async function getDate(){
-    let response = await fetch("http://localhost:4000/sendDate/date")
+    let response = await fetch("http://10.223.31.195:4000/sendDate/date")
     let data = await response.json()
     let date = new Date(data)
     let formattedDate = dateFormat(date, "yyyy-mm-dd'T'HH:MM:ss.ms")
